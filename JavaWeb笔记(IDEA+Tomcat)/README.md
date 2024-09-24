@@ -9,6 +9,7 @@
     - [4. 使用自定义文件名的jsp文件时, 运行报404](#4-使用自定义文件名的jsp文件时-运行报404)
     - [5. 将jstl相关jar包复制到`\web\WEB-INF\lib`目录下后, jsp页面中不识别jstl标签](#5-将jstl相关jar包复制到webweb-inflib目录下后-jsp页面中不识别jstl标签)
     - [6. 新版IDEA新建文件没有Servlet模板](#6-新版idea新建文件没有servlet模板)
+    - [7. 实现在一个JSP页面打开时就加载Servlet](#7-实现在一个jsp页面打开时就加载servlet)
 
 ## 一、IDEA创建JavaWeb项目
 
@@ -90,7 +91,6 @@
 
 - 打开`项目结构`-`库`, 点击`+`, 选择`Java`, 找到项目路径中的`jstl.jar`和`standard.jar`添加到模块中.
 
-
 ### 6. 新版IDEA新建文件没有Servlet模板
 
 - 到`文件`-`设置`-`编辑器`-`文件和代码模板`-`文件`, 点击`+`, 在右侧填写名称为`Servlet Class - 注解`, 将以下内容粘贴到右侧代码输入框后点击`确定`.
@@ -112,6 +112,8 @@
 
     @WebServlet("/${Entity_Name}")
     public class ${Class_Name} extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -133,5 +135,17 @@
   - `Entity Name`: 填写在`@WebServlet`注解中的实体名称
 
   - `Class Name`: 类名
+
+### 7. 实现在一个JSP页面打开时就加载Servlet
+
+- 把Servlet类`@WebServlet`注解中的实体名称添加到`web.xml`的`<welcome-file-list>`中.
+
+- 例如: Servlet类中`@WebServlet`注解为`@WebServlet("/NewsTypeController")`, 则`web.xml`中添加:
+
+    ```xml
+    <welcome-file-list>
+        <welcome-file>NewsTypeController</welcome-file>
+    </welcome-file-list>
+    ```
 
 - - -
