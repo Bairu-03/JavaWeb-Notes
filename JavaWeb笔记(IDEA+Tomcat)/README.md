@@ -9,7 +9,8 @@
     - [4. 使用自定义文件名的jsp文件时, 运行报404](#4-使用自定义文件名的jsp文件时-运行报404)
     - [5. 将jstl相关jar包复制到`\web\WEB-INF\lib`目录下后, jsp页面中不识别jstl标签](#5-将jstl相关jar包复制到webweb-inflib目录下后-jsp页面中不识别jstl标签)
     - [6. 新版IDEA新建文件没有Servlet模板](#6-新版idea新建文件没有servlet模板)
-    - [7. 实现在一个JSP页面打开时就加载Servlet](#7-实现在一个jsp页面打开时就加载servlet)
+    - [7. 新版IDEA新建文件没有Filter模板](#7-新版idea新建文件没有filter模板)
+    - [8. 实现在一个JSP页面打开时就加载Servlet](#8-实现在一个jsp页面打开时就加载servlet)
 
 ## 一、IDEA创建JavaWeb项目
 
@@ -116,12 +117,13 @@
 
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+            
         }
 
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+            
+            doGet(request, response);
         }
     }
     ```
@@ -130,13 +132,56 @@
 
 - 新建Servlet类时IDEA会提示输入`JAVAEE TYPR`, `Entity Name`和`Class Name`, 其含义分别为:
 
-  - `JAVAEE TYPE`: Java Servlet API版本, 可选项为`jakarta`(新版) 或 `javax`(旧版). 此项可不填, 默认为`javax`.
+  - `JAVAEE TYPE`: Java API版本, 可选项为`jakarta`(新版) 或 `javax`(旧版). 此项可不填, 默认为`javax`.
 
-  - `Entity Name`: 填写在`@WebServlet`注解中的实体名称
+  - `Entity Name`: 填写在`@WebServlet`注解中的内容, 即需要Servlet处理的请求的路径.
 
   - `Class Name`: 类名
 
-### 7. 实现在一个JSP页面打开时就加载Servlet
+### 7. 新版IDEA新建文件没有Filter模板
+
+- 到`文件`-`设置`-`编辑器`-`文件和代码模板`-`文件`, 点击`+`, 在右侧填写名称为`Filter Class - 注解`, 将以下内容粘贴到右侧代码输入框后点击`确定`.
+
+    ```java
+    #if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+    #parse("File Header.java")
+
+    #if ($JAVAEE_TYPE == "jakarta")
+    import jakarta.servlet.*;
+    import jakarta.servlet.annotation.*;
+    #else
+    import javax.servlet.*;
+    import javax.servlet.annotation.*;
+    #end
+    import java.io.IOException;
+
+    @WebFilter("/${Entity_Name}")
+    public class ${Class_Name} implements Filter {
+        public void init(FilterConfig config) throws ServletException {
+        }
+
+        public void destroy() {
+        }
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
+            
+            chain.doFilter(request, response);
+        }
+    }
+    ```
+
+- 添加上述Filter模板后, 在`文件`-`新建`中即可看到`Filter Class - 注解`项. 
+
+- 新建Filter类时IDEA会提示输入`JAVAEE TYPR`, `Entity Name`和`Class Name`, 其含义分别为:
+
+  - `JAVAEE TYPE`: Java API版本, 可选项为`jakarta`(新版) 或 `javax`(旧版). 此项可不填, 默认为`javax`.
+
+  - `Entity Name`: 填写在`@WebFilter`注解中的内容, 即过滤器将处理的请求范围.
+
+  - `Class Name`: 类名
+
+### 8. 实现在一个JSP页面打开时就加载Servlet
 
 - 把Servlet类`@WebServlet`注解中的实体名称添加到`web.xml`的`<welcome-file-list>`中.
 
@@ -147,5 +192,4 @@
         <welcome-file>NewsTypeController</welcome-file>
     </welcome-file-list>
     ```
-
 - - -
